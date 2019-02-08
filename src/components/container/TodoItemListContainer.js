@@ -1,39 +1,31 @@
 import React, {Component} from "react";
-import {completedFilterDictionary} from "../presentational/CompletedFilter";
 import TodoItemContainer from "./TodoItemContainer";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import * as actions from "../../actions";
+import * as selectors from '../../selectors';
 
 
 class TodoItemListContainer extends Component {
     toggleCompletedHandler = (id) => {
-        this.props.toggleCompletedHandler(id);
+        this.props.toggleTodo(id);
     };
 
     addTodoItemHandler = (id) => {
-        this.props.addTodoItemHandler(id);
+        this.props.addTodo(id);
     };
 
     removeTodoItemHandler = (id) => {
-        this.props.removeTodoItemHandler(id);
+        this.props.removeTodo(id);
     };
 
     editTodoItemHandler = (id, text) => {
-        this.props.editTodoItemHandler(id, text);
+        this.props.editTodo(id, text);
     };
-
-
-    isFilterMatched = (todoItemText) => todoItemText.match(new RegExp(this.props.textFilter, 'i'));
 
     render() {
         return (
-            this.props.todoItems.filter(
-                (todoItem) =>
-                    this.isFilterMatched(todoItem.text)
-                    && (
-                        todoItem.isCompleted === this.props.completedFilter
-                        || this.props.completedFilter === completedFilterDictionary.showAll
-                    )
-            ).map(
+            this.props.filteredTodos.map(
                 (todoItem) =>
                     <TodoItemContainer
                         key={todoItem.id}
@@ -50,14 +42,24 @@ class TodoItemListContainer extends Component {
 
 
 TodoItemListContainer.propTypes = {
-    textFilter: PropTypes.string.isRequired,
-    completedFilter: PropTypes.any,
-    todoItems: PropTypes.array.isRequired,
-    addTodoItemHandler: PropTypes.func.isRequired,
-    toggleCompletedHandler: PropTypes.func.isRequired,
-    removeTodoItemHandler: PropTypes.func.isRequired,
-    editTodoItemHandler: PropTypes.func.isRequired,
+    filteredTodos: PropTypes.array.isRequired,
+    addTodo: PropTypes.func.isRequired,
+    toggleTodo: PropTypes.func.isRequired,
+    removeTodo: PropTypes.func.isRequired,
+    editTodo: PropTypes.func.isRequired,
 };
 
 
-export default TodoItemListContainer;
+const mapStateToProps = state => ({
+    filteredTodos: selectors.selectFilteredTodos(state),
+  });
+  
+  export default connect(
+    mapStateToProps,
+    {
+      addTodo: actions.addTodo,
+      removeTodo: actions.removeTodo,
+      editTodo: actions.editTodo,
+      toggleTodo: actions.toggleTodo
+    }
+  )(TodoItemListContainer);

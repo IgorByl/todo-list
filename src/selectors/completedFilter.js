@@ -1,0 +1,1 @@
+export const selectCompletedFilter = state => state.completedFilter;
